@@ -1,14 +1,38 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Movie } from '@/lib/types';
 import MainLayout from '@/components/layouts/MainLayout';
 import MovieGrid from '@/components/MovieGrid';
 import { searchMovies } from '@/lib/api';
+import { Loader2 } from 'lucide-react';
 
-interface SearchPageProps {
-  searchParams: { query: string };
-}
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query');
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.query;
+  useEffect(() => {
+    const fetchMovies = async () => {
+      if (!query) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+        const results = await searchMovies(query);
+        setMovies(results);
+      } catch (err) {
+        setError('Failed to search movies. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, [query]);
 
   if (!query) {
     return (
@@ -21,8 +45,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
   }
 
-  const movies = await searchMovies(query);
-
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -31,7 +53,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <p className="text-muted-foreground">Found {movies.length} results for &quot;{query}&quot;</p>
         </div>
 
-        <MovieGrid movies={movies} />
+        {error && (
+          <div className="text-destructive text-center py-4">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <MovieGrid movies={movies} />
+        )}
       </div>
     </MainLayout>
   );

@@ -56,7 +56,12 @@ export default function MovieDetailsDialog({ movie, onClose }: MovieDetailsDialo
   }, [movie]);
 
   return (
-    <Dialog open={!!movie} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={!!movie} onOpenChange={(open) => {
+      if (!open) {
+        onClose();
+        setDetails(null);
+      }
+    }}>
       <DialogContent className="sm:max-w-[600px] bg-card">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">

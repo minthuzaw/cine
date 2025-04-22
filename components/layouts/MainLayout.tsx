@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import Footer from '@/components/Footer';
@@ -10,11 +11,13 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
+  const searchParams = useSearchParams();
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  
-  const handleGenreSelect = (genre: string) => {
-    setSelectedGenre(genre === selectedGenre ? null : genre);
-  };
+
+  useEffect(() => {
+    const genreName = searchParams.get('name');
+    setSelectedGenre(genreName);
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -24,10 +27,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <div className="w-full lg:w-3/4">
             {children}
           </div>
-          <Sidebar 
-            className="hidden lg:block" 
-            selectedGenre={selectedGenre} 
-            onGenreSelect={handleGenreSelect} 
+          <Sidebar
+            className="hidden lg:block"
+            selectedGenre={selectedGenre}
           />
         </div>
       </main>

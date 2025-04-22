@@ -13,11 +13,10 @@ import MovieDetailsDialog from './MovieDetailsDialog';
 
 interface SidebarProps {
   selectedGenre: string | null;
-  onGenreSelect: (genre: string) => void;
   className?: string;
 }
 
-export default function Sidebar({ selectedGenre, onGenreSelect, className }: SidebarProps) {
+export default function Sidebar({ selectedGenre, className }: SidebarProps) {
   const router = useRouter();
   const [genres, setGenres] = useState<Genre[]>([]);
   const [tvShows, setTvShows] = useState<Movie[]>([]);
@@ -36,7 +35,6 @@ export default function Sidebar({ selectedGenre, onGenreSelect, className }: Sid
   }, []);
 
   const handleGenreClick = (genre: Genre) => {
-    onGenreSelect(genre.name);
     router.push(`/genre?id=${genre.id}&name=${encodeURIComponent(genre.name)}`);
   };
 
